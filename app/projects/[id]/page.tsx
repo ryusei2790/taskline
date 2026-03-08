@@ -59,6 +59,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
     try {
       const result = await generateFromText(inputText, project.deadline);
       setScheduleResult(result);
+      // 生成後は実際の totalDays に基づいてスケールを更新
+      setViewMode(getAutoViewMode(result.availableDays));
       setActiveTab('gantt');
     } catch (err) {
       setGenerateError(err instanceof Error ? err.message : 'スケジュール生成に失敗しました');

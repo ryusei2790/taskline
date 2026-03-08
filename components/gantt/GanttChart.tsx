@@ -38,24 +38,20 @@ export function GanttChart({ tasks, viewMode = 'Day' }: GanttChartProps) {
       const Gantt = module.default;
       if (!containerRef.current) return;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // date_format は各 view_mode のデフォルトに任せるため指定しない
+      // popup は新 API（ctx ベース）を使用
       new Gantt(containerRef.current, ganttTasks, {
         view_mode: viewMode,
-        date_format: 'YYYY-MM-DD',
-        language: 'ja',
+        language: 'en',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        custom_popup_html: (task: any) => {
-          const original = displayTasks.find((t) => t.id === task.id);
+        popup: (ctx: any) => {
+          const original = displayTasks.find((t) => t.id === ctx.task.id);
+          ctx.set_title(ctx.task.name);
           if (original?.isHourBased && original.estimatedHours) {
-            return `
-              <div class="details-container">
-                <h5>${task.name}</h5>
-                <p>所要時間: ${original.estimatedHours}時間</p>
-                <p>${task.start} 〜 ${task.end}</p>
-              </div>
-            `;
+            ctx.set_subtitle(`所要時間: ${original.estimatedHours}時間`);
+          } else {
+            ctx.set_subtitle('');
           }
-          return null;
         },
       } as never);
     });
